@@ -10,3 +10,5 @@ class Event(Base):
     title: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[str] = mapped_column(Text)
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    location: Mapped[str] = mapped_column(String, nullable=True, default="Main Campus")
+    image_url: Mapped[str] = mapped_column(String, nullable=True)

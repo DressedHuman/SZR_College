@@ -1,12 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from app.models.teacher import Teacher
 from app.schemas.teacher import TeacherCreate
 
 class TeacherService:
     @staticmethod
     async def get_teachers(session: AsyncSession, skip: int = 0, limit: int = 100, department: str = None):
-        stmt = select(Teacher).offset(skip).limit(limit)
+        stmt = select(Teacher).options(joinedload(Teacher.user)).offset(skip).limit(limit)
         if department:
             stmt = stmt.where(Teacher.department == department)
         result = await session.execute(stmt)
@@ -14,7 +15,7 @@ class TeacherService:
 
     @staticmethod
     async def get_teacher(session: AsyncSession, teacher_id: int):
-        stmt = select(Teacher).where(Teacher.id == teacher_id)
+        stmt = select(Teacher).options(joinedload(Teacher.user)).where(Teacher.id == teacher_id)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 

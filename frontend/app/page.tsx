@@ -3,13 +3,41 @@ import { QuickLinks } from "@/components/home/QuickLinks"
 import { NoticesAndMessage } from "@/components/home/NoticesAndMessage"
 import { EventsPreview } from "@/components/home/EventsPreview"
 import { GalleryPreview } from "@/components/home/GalleryPreview"
+import { getNotices, getEvents } from "@/lib/api"
 
-export default function Home() {
-  const notices = [
-    { day: "12", month: "OCT", title: "Final Examination Schedule for Honors 4th Year", description: "Detailed timeline for the upcoming final assessments..." },
-    { day: "08", month: "OCT", title: "Holiday Notice for Durga Puja & Lakshmi Puja", description: "The college will remain closed from Oct 20th to Oct 28th..." },
-    { day: "05", month: "OCT", title: "Orientation for HSC 1st Year Students", description: "Welcome ceremony at the central auditorium starting 10:00 AM..." },
-  ]
+export default async function Home() {
+  let notices: any[] = [];
+  let events: any[] = [];
+
+  try {
+    const [rawNotices, rawEvents] = await Promise.all([
+      getNotices(),
+      getEvents()
+    ]);
+
+    notices = rawNotices.slice(0, 3).map(n => {
+      const date = new Date(n.published_at);
+      return {
+        day: date.getDate().toString().padStart(2, '0'),
+        month: date.toLocaleString('default', { month: 'short' }).toUpperCase(),
+        title: n.title,
+        description: n.content.substring(0, 100) + (n.content.length > 100 ? '...' : '')
+      };
+    });
+
+    events = rawEvents.slice(0, 3).map(e => {
+      const date = new Date(e.date);
+      return {
+        imageSrc: e.image_url || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop",
+        dateStr: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        title: e.title,
+        location: e.location || "Main Campus"
+      };
+    });
+  } catch (error) {
+    console.error("Failed to fetch homepage data:", error);
+    // Fallback or empty state managed by components
+  }
 
   const principalMessage = {
     imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBpoSpoNXmuSafFICYGSA79YIbtjUVXVqxoJooFqpAUSvDWz2ZsUT6H1VZgX9xbIr6b9_rdeWVfjbaBCNO_EeZc5eEiHnp6sZ3r4xpOVBKhL7XJsG3SQV80q0LpA4KTxNwcpIsDO8fmuKhq-1v4swT0nDmDSF2PuSAO9awjFF5420uMN_YznjEdkz-K7L08KvdoeFyejdf1Owz7e2Tzp_MMserhyOq0wODpM5rL7Mbdv0quPD209dKXhvslSPCmarOBlKPh33p2nBA",
@@ -17,27 +45,6 @@ export default function Home() {
     name: "Prof. Dr. Zahirul Haque",
     designation: "Principal, SZR College"
   }
-
-  const events = [
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuCxNumfYmRa6U4MZg17Kd044_iBD3TuCh8BQ2FYzDZuRaSPWYsenk-EfdvhqOFOr9X6dhgBfbWwc68jWARV4Rpb-ZWWWx9qOXNAc7Q6bbh33oaDVasg0WUdXHufb9Lo7KYlE-v12hWnSPy1WIZs-bw4tno_iF8F7uknk69AltoP1iqtbvCWPKVC4MhmaEwZXTw4PlmVINu7KBZAouhJYS6RmMyZWd6QE1vuQ4OIEUWoT3kpJn6zlFaOJR83q8-7FJTY6wW5efLapY0",
-      dateStr: "Nov 15, 2024",
-      title: "Annual Science & Tech Fair",
-      location: "Main Campus Plaza"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuB4DGSc0bttIQy0kKA3DCyUssVLl_XLJgJXdwMv0k-LPPbk8VRB_kwE_vyYsdQw5kAGVz11dh3BVMA3NPU2LHKOWergg5ArcWq1l7EiaSMR8dzvIsZ8FxrTFK55pNZfavGzA4YLMlHJtDZclHusxCgdI5m1hiE81DOx6-gKka_ui4Hvg_LTztrH4SloykRu443Z2l7JOml0EpKgcxhsBVWg-qEPZW4XMHz7e_RaVE8_5YBL4GF0suVKSsVSEg8azZSEGYuuU1OXwS4",
-      dateStr: "Dec 02, 2024",
-      title: "Inter-College Sports Week",
-      location: "College Sports Complex"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuAxVt_DfMrK8pFdqLHgxCWAVaTkhDmES0y-57Tkou3fIxtoGFqeNrasktn7hgZ0vM8wDPqLHUcS8x7Y--NaVhp5FcDoLhYsm1I2DG9USOAiKYUrZWfXqUwVGDs-oGKJ2oemlC3qxXWTcziF6VlY0LGo1ahxmZSsk76fa6cqm9ad22RW5WgMMsnob9RGcItbmYdJ3Xv2OJWThjM2FNG6nKM8w6kbDBuP1vPIZxVH9p8_JuEXgrGlnhK_rfIU1-l-DrFvZqN_-F3OOcs",
-      dateStr: "Jan 10, 2025",
-      title: "Cultural Heritage Festival",
-      location: "Central Auditorium"
-    }
-  ]
 
   const galleryData = {
     title: "Life at SZR College",

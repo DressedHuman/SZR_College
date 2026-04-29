@@ -30,7 +30,7 @@ export function NoticesAndMessage({ notices, principalMessage }: NoticesAndMessa
         <div className="lg:col-span-5 space-y-8">
           <SectionHeader 
             title="Recent Notices" 
-            action={<a className="text-primary font-bold text-sm underline underline-offset-4 font-body" href="#">View Archive</a>} 
+            action={<a className="text-primary font-bold text-sm underline underline-offset-4 font-body" href="/notices">View Archive</a>} 
             className="mb-0" // override mb-8
           />
           <div className="space-y-4">

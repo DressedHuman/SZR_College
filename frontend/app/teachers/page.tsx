@@ -1,58 +1,23 @@
 import * as React from "react"
 import { Search, ChevronDown } from "lucide-react"
 import { TeacherCard } from "@/components/ui/teacher-card"
+import { getTeachers } from "@/lib/api"
 
-export default function TeachersPage() {
-  const teachers = [
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuB11fQG4qVa0ssOWPUtzPP4fD1O7qWIIp-2uC0HzzKEWNziZbnR8l9zRqlGJYMfjdizyAx8KHKuXXFrSuDf4SLPtiCldD42ige9o4GjOj-b74FT0SeDUJ2BiJnD7YtFertNyBD4HiV3dGlWmZwGGD2U0Heu8FdRpQ4_Tn7PvQqwfO6oSoVYRbU-kWws17F_kVq5bPaONOlgU5aBkK9s0HX0wmTQBb8zRv4nrtyQ3Z-I9cZv7CH6eyRiH7stgvnPI2WbGd9gC-e5sTU",
-      department: "Department of Physics",
-      name: "Dr. Ahmed Zubayer",
-      designation: "Head of Department & Professor"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuDOe1jtuDb766Qy_VHhFtGhUUpKCDUVjeq0pssAclCQgaxSU0qahg1fsSxbqH37mdmfogOsDeQrtaDqkdKcKlthMf2mbv5zRirYMhP_Lz6vGu414WqF6lfJfXGhEUmTQWtxyJk_xW-N8P1xboHNOGCx6A4BCmlWzUo3zNJVPzi4v74iXk1dBxQx4Sk1IM0vc5jIFYZCUT6YNcfAPSJP70gEi7KOTT216XiV1Q21J2LjIZ7Mdo3KRozZAALIOJ1FO-9EX83V7TzhIh4",
-      department: "Department of English",
-      name: "Prof. Nusrat Jahan",
-      designation: "Associate Professor"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBSGvHEROkvoHIg3O2DJsvSOgmO5z90Y_7LE3XH2GIVe_8NbJdmyoZzk1qFKv47zCSvsfY1fjmALOCt6_yP6JACWvDLQ9Mtz0tRDFhOeyQ7N3KxsdxDcrM5fyMMnbzKQZolvOZAPtE6b7Pzo-sUMn3q2pQuh1j-pWVX_MQ-I667Vi1pung8h5RFn3yyMvqd5OGcTuquCGHN0JjLZqbzvFdM0iBJ9-17zQsOqp2G3M1YLhYofazW3ZeSptuA4RnqVk7QhuBlHFaUfB8",
-      department: "Department of Biology",
-      name: "Dr. Mahfuzur Rahman",
-      designation: "Senior Lecturer"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuAfm_utVtQU_yFnvx0Dt_K7MbFqkJcrDN2wNjGgC9yMKdeiZAVqCQoH6HGEpX_tWay1Lo-7asOQO8b6RsebHW-iRucOTN28Qr_jIWF9hiSrL0do_8y4vDazo2BddBgJqp9qx6kmGEKMaxXNYlWXz7gObRwwmDitnbfirR8zM576qSWfqrCFW3xETXK3Qh5hrqzrMt5AxN4gpkZPQOs3laZIaNRFcHygqN9T7le9eFOS9bM8fX4Qk5gaaRHVcMLQa3egyi-346ERNFQ",
-      department: "Department of Chemistry",
-      name: "Prof. Zakir Hossain",
-      designation: "Professor"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuA8q53273v1MgV_Vxtbz7J5X0TxBLeJi4FSHPxWW1vJXEtyYenzc03FTi-WcF2WHB2I4KBPApfPRMhRia4JXxkcDaNiE7kjQc0Qx-yfSF8_viMAaZPwvdbNQStw_jHz3az8GAPYp09Epbi2AamviJkCbHjohRHQYDjF4U8Z0ZUh_F4D-M0qJWoF_y9ILQsyw2vmrxjC7xuT0ElaVWP--x98o4obA2kOl4OlJka-HIeaxHDx5YV7Baoj_UDjXWjdyQIN2yIllxGVsIo",
-      department: "Department of History",
-      name: "Dr. Sarah Perveen",
-      designation: "Associate Professor"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuaJyzSk9waXCk5OQ5e8_fJIQf7L5wl6T-cRMqi4IboUSVOtx1IIx7OAWiYm_QapW10j-Io6W7FMet4ItqYK9ZEu9-llQXV-_ZQYqHG5UxPY82Nc_eghxBkiCjpJBbsebp6hWYJIPE1Y1J2ojeYXa1EPLMrYUKKnPL8c-kxP32B6Jf876M_RyzEiSd7bQXwZFqXwt89wbFII16FaYgUgeQOayYKp-yKogxDfzjEbK51kMZhkzn7seMbIedJvTk-GC-uDPCW_z8sZU",
-      department: "Department of Mathematics",
-      name: "Mr. Kamrul Hassan",
-      designation: "Lecturer"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuCvzZgd_qJH9YNGTCX0ipMVaeR3TCDE-CXKU8k7Lpzz_Y_uiFfIxSbD4vZCN9vyLniCdFOyi2d7ZduRPA0HOVw4qebRaWoB79amw2U283ZCDixNLvJTt9uBXR6ZjYk3C86PtnOqHgNxCenEsKcwUf5JdegR3tCk5G4UNaAwRseaSbuEGMr1CcjXpb6N94nVMwarysOzXA4Pa-c8J_qAuwX_t8YJZzbISzZQIpGB_dETAP8Fk7Rfh8BkOaBA_atzn-KTbYF8gyPQDUU",
-      department: "Department of Economics",
-      name: "Prof. Farhana Haque",
-      designation: "Senior Professor"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuDZ7JHjAKxoVI0wv4OE0JCx5fNSmJZHREn2iiMDu4owvZsNJp3TEJa5RDtdxzeCV5qEhn9r6d4ufhFk1cdtwLhZF6_3_O_9PFxjOopCpvvijYJV5XfgC-6mZVrnFCCD4gmJ9SbAG_54tRIJ881Bw5X48I9ZFe2s8Q1foJ7DOlEp_Ilgeg12vjfXNr9HyI1Y_hx5Fw8i--bdGIrLFeDKNUNLrpSzv6tQNDmSdtdap0dQ8aaSjFONy13WtNdjTuzHnqUlEvFOwGoSbcg",
-      department: "Department of Commerce",
-      name: "Mr. Shafiqul Islam",
-      designation: "Head of Commerce"
-    }
-  ]
+export default async function TeachersPage() {
+  let teachers: any[] = [];
+
+  try {
+    const rawTeachers = await getTeachers();
+    teachers = rawTeachers.map(t => ({
+      imageSrc: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop", // Placeholder for image as API doesn't have it
+      department: t.department,
+      name: t.user.name,
+      designation: t.designation,
+      email: t.user.email
+    }));
+  } catch (error) {
+    console.error("Failed to fetch teachers:", error);
+  }
 
   return (
     <>
@@ -107,11 +72,17 @@ export default function TeachersPage() {
 
       {/* Teachers Grid */}
       <section className="max-w-7xl mx-auto px-8 mt-12 mb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
-          {teachers.map((teacher, i) => (
-            <TeacherCard key={i} {...teacher} />
-          ))}
-        </div>
+        {teachers.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+            {teachers.map((teacher, i) => (
+              <TeacherCard key={i} {...teacher} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No faculty members found at the moment.</p>
+          </div>
+        )}
 
         {/* Pagination/Load More */}
         <div className="mt-20 flex justify-center">

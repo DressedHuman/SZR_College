@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.schemas.user import UserResponse
 
 class TeacherBase(BaseModel):
     department: str
@@ -10,5 +11,6 @@ class TeacherCreate(TeacherBase):
 class TeacherResponse(TeacherBase):
     id: int
     user_id: int
+    user: UserResponse
 
     model_config = {"from_attributes": True}

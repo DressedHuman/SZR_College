@@ -3,37 +3,39 @@ import { ChevronRight, Clock, MapPin, ArrowRight, Image as ImageIcon } from "luc
 import { EventCard } from "@/components/ui/event-card"
 import { FeaturedEvent } from "@/components/ui/featured-event"
 import { Button } from "@/components/ui/button"
+import { getEvents } from "@/lib/api"
 
-export default function EventsPage() {
-  const upcomingEvents = [
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuDiFFOKAmN5zex8EokbbLTzWb9CnBjI9GKDLi6BcpzfSO70U0YGVq8Gdy7F38MS0Rkz31Dl0QZUzbJBMmPp94LMy_6lkSbUePAWG0yEN4eVSUiT0DuSpT_Qdbqr2V42G_dQYMQC1e1ZLXu6f_EpPm-iE4VsixBw34RQDtACabtIbBS4tgKCgvzAAyJZBlbQEUv6wkeC9r7Lr9CxRgUUEcTTmfXQMBNVJ5eHLVckCApp8VHDq6rmIK7MSuIP3bMfbgBh_CnnVvMwUHM",
-      dateStr: "Jan 05, 2024",
-      title: "Annual Science & Tech Fair 2024",
-      location: "Main Campus Plaza"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBnOcKy0pI4d4FWgIKrcsVNHf3xBJWch5Xdu_fBcaipnrQ8LwayCf2_cI6L1GjLOxbuAibXqG5GwrnRve29LJ3wgyHB13Rq2h1r2avF08iqPW50laX0JHFBd3d2YjvarOuHODmmilsgZm7bmRZqjltj1ocTlvDexleNG_jjFBJQi_sY-TxfZGiwbOVNf-eFOrv8c9xz7UaWpbsrg0wTxsTRCRW9C3ax8UylzdRX2VcJQr49w3FXplsgkIcnGrKPRlihuMU1lGVkB18",
-      dateStr: "Jan 12, 2024",
-      title: "Inter-College Football Finals",
-      location: "College Stadium"
-    },
-    {
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuCOewHuCjYvLfsR2fEhJmdyhGp6-FFew0t3rgHwzLm4Vi1ff2Pes9pw8inqt81uuHAXnp4RUZduTBV0GpLgnKEC17Q6wIMcAq9TD5Nmyq4DCGbyEq56xBzdEpB_Rk2_gafPeGF_BQ3xZFHDpjQ5HEmKPTbxFXgXNCPaiSkSj70qLocidr3P2uZ7kR1qY7k0QmYEvHiZgKYucNFBnRBzZ0AE_oGMUE79gM7RWWY0x5u1OPUACMTNN5ONZJ-AAbXUVA5SSQs087nSrZk",
-      dateStr: "Feb 14, 2024",
-      title: "Basanta Utsav: Spring Festival",
-      location: "Central Auditorium"
+export default async function EventsPage() {
+  let events: any[] = [];
+  let featuredEvent: any = null;
+
+  try {
+    const rawEvents = await getEvents();
+    events = rawEvents.map(e => {
+      const date = new Date(e.date);
+      return {
+        imageSrc: e.image_url || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop",
+        dateStr: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        title: e.title,
+        location: e.location || "Main Campus"
+      };
+    });
+
+    if (rawEvents.length > 0) {
+      const first = rawEvents[0];
+      const date = new Date(first.date);
+      featuredEvent = {
+        imageSrc: first.image_url || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop",
+        day: date.getDate().toString().padStart(2, '0'),
+        month: date.toLocaleString('default', { month: 'short' }),
+        title: first.title,
+        description: first.description,
+        time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        location: first.location || "Main College Playground",
+      };
     }
-  ]
-
-  const featuredEventData = {
-    imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_bz5IURQaSirJPvkGiOQmQelZbhVPelQU2rT3PMr3XdpcTQ9wQUiBNC2ftcDxiSTB9OcLY5GXHLUaTTLRZTEObUspd2qVLvex6cwfNKKiEgtsYBlxCsOwGoMf9FxZnUYx67_Ft5sgDHkcqrgFwo1VSot8G76RLRKQMskTUhlv76kkewdtcy15VMfQUiQPg2TKLfJudM2nyfzE4hRfW878Q2WUawRRcwLNZqKw6CZSYS-ymyqrSEEFfoVX3cxvxrkgTA476BhZM8g",
-    day: "16",
-    month: "Dec",
-    title: "Victory Day Celebration: 53rd Bijoy Dibosh",
-    description: "Join us for a day of patriotic fervor as we commemorate our national heroes through cultural performances, poetry recitals, and a grand flag-hoisting ceremony.",
-    time: "09:00 AM — 04:00 PM",
-    location: "Main College Playground",
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
   }
 
   return (
@@ -67,7 +69,13 @@ export default function EventsPage() {
 
       {/* Upcoming Featured Event */}
       <section className="px-8 lg:px-24 mb-20 max-w-7xl mx-auto">
-        <FeaturedEvent {...featuredEventData} />
+        {featuredEvent ? (
+          <FeaturedEvent {...featuredEvent} />
+        ) : (
+          <div className="bg-accent rounded-2xl h-80 flex items-center justify-center">
+            <p className="text-muted-foreground">No featured events at the moment.</p>
+          </div>
+        )}
       </section>
 
       {/* Event Grid */}
@@ -79,11 +87,18 @@ export default function EventsPage() {
             View Calendar <ArrowRight size={16} />
           </a>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {upcomingEvents.map((event, i) => (
-            <EventCard key={i} {...event} />
-          ))}
-        </div>
+        
+        {events.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {events.map((event, i) => (
+              <EventCard key={i} {...event} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">Stay tuned for more upcoming events!</p>
+          </div>
+        )}
       </section>
 
       {/* Past Events Section */}
@@ -99,7 +114,7 @@ export default function EventsPage() {
                 <img 
                   className="w-full h-full object-cover" 
                   alt="Debate" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzP5H_LdHnpA7DRqJnRlZef6kT2niT5XXKbUk_6PZCeBzhGstpuT-lzXpJH9L2BzHxtQ_QhjzTZjkYG117qmlSWscLsZ2194QoY3V_hxkl-Ud0Yobl8YXywUQiz0GC_JO2GdstuBL9rQNtjmtZ1iqKwjMk2Pd1AS8h0TRiMgGYrk1wqof9SQku98gFZoOuzQOb2dEuKK-LNueCIxLeabMNeqntoYmzBQoEcSEd4EcbzEdr1Nr_1KKefzc8ovXkfHPXT0pCXI9SbLk"
+                  src="https://images.unsplash.com/photo-1524178232363-1fb28f74b671?q=80&w=2070&auto=format&fit=crop"
                 />
               </div>
               <div className="flex-grow">
@@ -119,7 +134,7 @@ export default function EventsPage() {
                 <img 
                   className="w-full h-full object-cover" 
                   alt="Orientation" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDh6_N8OcIVATD06RjL1zHq4CN9myKA27Ce7a5Kwq7dXziRGLoMFagTelHxGuSlyOL0YjELfECQ-vZYjFWuGX1M8N6yOduXxF66bqJN3lT9gF6JyWn5Jk6tao4O6kujkTr9guNfoen9KHe1MiC9qmpjPTEqOeZYPPkRCexf16hWwaMNIEbiXB_NLi4fWXQi10FCC4nSB4QQDiEUPi_Ll5YEjvpbuX5oZI9VefCRhWLTaZV4KcaGkm1-8WZPCFQNYZX8yZJgLG_o7w"
+                  src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop"
                 />
               </div>
               <div className="flex-grow">
