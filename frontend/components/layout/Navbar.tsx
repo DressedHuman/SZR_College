@@ -4,18 +4,20 @@ import * as React from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const pathname = usePathname()
 
   const navLinks = [
-    { name: "Home", href: "/", active: true },
+    { name: "Home", href: "/" },
     { name: "About", href: "/about" },
-    { name: "Academic", href: "/academic" },
-    { name: "Admissions", href: "/admissions" },
-    { name: "Notice", href: "/notice" },
-    { name: "Contact", href: "/contact" },
+    { name: "Departments", href: "/departments" },
+    { name: "Teachers", href: "/teachers" },
+    { name: "Events", href: "/events" },
+    { name: "Gallery", href: "/gallery" },
   ]
 
   return (
@@ -27,20 +29,22 @@ export function Navbar() {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href
+            return (
             <Link
               key={link.name}
               href={link.href}
               className={cn(
                 "font-heading text-sm tracking-tight transition-colors",
-                link.active
+                isActive
                   ? "font-bold text-primary border-b-2 border-secondary pb-1"
                   : "font-medium text-muted-foreground hover:text-primary"
               )}
             >
               {link.name}
             </Link>
-          ))}
+          )})}
         </div>
         
         <div className="hidden md:flex">
@@ -61,13 +65,15 @@ export function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-background border-b border-border px-8 py-4 flex flex-col gap-4 shadow-lg absolute w-full left-0 top-[100%]">
-          {navLinks.map((link) => (
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href
+            return (
             <Link
               key={link.name}
               href={link.href}
               className={cn(
                 "font-heading text-sm tracking-tight transition-colors py-2",
-                link.active
+                isActive
                   ? "font-bold text-primary border-l-4 border-secondary pl-3 -ml-4"
                   : "font-medium text-muted-foreground hover:text-primary"
               )}
@@ -75,7 +81,7 @@ export function Navbar() {
             >
               {link.name}
             </Link>
-          ))}
+          )})}
           <div className="pt-4 border-t border-border">
             <Button variant="primary" className="w-full font-semibold">
               Student Portal
