@@ -2,14 +2,37 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { getToken, removeToken } from "@/lib/auth"
+import { getCurrentUser, User } from "@/lib/api"
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const [user, setUser] = React.useState<User | null>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  React.useEffect(() => {
+    const token = getToken()
+    if (token) {
+      getCurrentUser(token)
+        .then(setUser)
+        .catch(() => setUser(null))
+    } else {
+      setUser(null)
+    }
+  }, [pathname])
+
+  const handleLogout = () => {
+    removeToken()
+    setUser(null)
+    router.push("/")
+    router.refresh()
+  }
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -47,10 +70,36 @@ export function Navbar() {
           )})}
         </div>
         
-        <div className="hidden md:flex">
-          <Button variant="primary" className="px-5 py-2.5 font-semibold">
-            Student Portal
-          </Button>
+        <div className="hidden md:flex items-center gap-3">
+          {user ? (
+            <>
+              {user.role === "admin" && (
+                <Link href="/admin">
+                  <Button variant="outline" className="px-4 py-2 font-semibold text-sm">
+                    Admin Panel
+                  </Button>
+                </Link>
+              )}
+              <Link href="/dashboard">
+                <Button variant="primary" className="px-5 py-2.5 font-semibold">
+                  Dashboard
+                </Button>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-muted-foreground hover:text-destructive transition-colors rounded-lg hover:bg-accent"
+                title="Sign Out"
+              >
+                <LogOut size={18} />
+              </button>
+            </>
+          ) : (
+            <Link href="/login">
+              <Button variant="primary" className="px-5 py-2.5 font-semibold">
+                Student Portal
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -82,10 +131,35 @@ export function Navbar() {
               {link.name}
             </Link>
           )})}
-          <div className="pt-4 border-t border-border">
-            <Button variant="primary" className="w-full font-semibold">
-              Student Portal
-            </Button>
+          <div className="pt-4 border-t border-border space-y-3">
+            {user ? (
+              <>
+                {user.role === "admin" && (
+                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full font-semibold">
+                      Admin Panel
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="primary" className="w-full font-semibold">
+                    Dashboard
+                  </Button>
+                </Link>
+                <button
+                  onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                  className="w-full text-left text-sm font-semibold text-destructive py-2 font-body flex items-center gap-2"
+                >
+                  <LogOut size={16} /> Sign Out
+                </button>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="primary" className="w-full font-semibold">
+                  Student Portal
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       )}
