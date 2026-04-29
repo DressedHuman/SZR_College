@@ -7,9 +7,17 @@ function decodeJwtPayload(token: string): Record<string, any> | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
-    const payload = JSON.parse(atob(parts[1]));
+    
+    // Convert Base64Url to Base64
+    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) {
+      base64 += "=";
+    }
+    
+    const payload = JSON.parse(atob(base64));
     return payload;
-  } catch {
+  } catch (err) {
+    console.error("JWT Decode Error:", err);
     return null;
   }
 }

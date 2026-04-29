@@ -10,7 +10,9 @@ import { saveToken } from "@/lib/auth"
 import { GraduationCap, Loader2, AlertCircle } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 
-export default function LoginPage() {
+import { Suspense } from "react"
+
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = React.useState("")
@@ -27,7 +29,6 @@ export default function LoginPage() {
       const data = await login(email, password)
       saveToken(data.access_token)
 
-      // Determine redirect based on role
       const user = await getCurrentUser(data.access_token)
       const from = searchParams.get("from")
       const destination = from || (user.role === "admin" ? "/admin" : "/dashboard")
@@ -62,13 +63,13 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-primary font-body" htmlFor="email">Email Address</label>
                 <Input 
-                  id="email"
-                  type="email" 
-                  placeholder="name@szrcollege.edu" 
-                  required 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="rounded-xl h-12 focus-visible:ring-primary font-body"
+                   id="email"
+                   type="email" 
+                   placeholder="name@szrcollege.edu" 
+                   required 
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
+                   className="rounded-xl h-12 focus-visible:ring-primary font-body"
                 />
               </div>
               <div className="space-y-2">
@@ -77,12 +78,12 @@ export default function LoginPage() {
                   <a className="text-xs font-bold text-secondary hover:underline font-body" href="#">Forgot Password?</a>
                 </div>
                 <Input 
-                  id="password"
-                  type="password" 
-                  required 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="rounded-xl h-12 focus-visible:ring-primary font-body"
+                   id="password"
+                   type="password" 
+                   required 
+                   value={password}
+                   onChange={(e) => setPassword(e.target.value)}
+                   className="rounded-xl h-12 focus-visible:ring-primary font-body"
                 />
               </div>
 
@@ -117,5 +118,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={48} /></div>}>
+      <LoginContent />
+    </Suspense>
   )
 }
