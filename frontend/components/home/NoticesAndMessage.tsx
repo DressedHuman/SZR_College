@@ -1,49 +1,32 @@
 import * as React from "react"
 import { Quote } from "lucide-react"
+import { NoticeCard } from "@/components/ui/notice-card"
+import { SectionHeader } from "@/components/ui/section-header"
 
 export function NoticesAndMessage() {
+  const notices = [
+    { day: "12", month: "OCT", title: "Final Examination Schedule for Honors 4th Year", description: "Detailed timeline for the upcoming final assessments..." },
+    { day: "08", month: "OCT", title: "Holiday Notice for Durga Puja & Lakshmi Puja", description: "The college will remain closed from Oct 20th to Oct 28th..." },
+    { day: "05", month: "OCT", title: "Orientation for HSC 1st Year Students", description: "Welcome ceremony at the central auditorium starting 10:00 AM..." },
+  ]
+
   return (
     <section className="pb-24">
       <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* Recent Notices */}
         <div className="lg:col-span-5 space-y-8">
-          <div className="flex justify-between items-end">
-            <h2 className="text-3xl font-black text-primary tracking-tight font-heading">Recent Notices</h2>
-            <a className="text-primary font-bold text-sm underline underline-offset-4 font-body" href="#">View Archive</a>
-          </div>
+          <SectionHeader 
+            title="Recent Notices" 
+            action={<a className="text-primary font-bold text-sm underline underline-offset-4 font-body" href="#">View Archive</a>} 
+            className="mb-0" // override mb-8
+          />
           <div className="space-y-4">
-            <div className="p-6 bg-accent rounded-[12px] flex gap-6 items-start hover:bg-accent/80 transition-colors">
-              <div className="text-center px-4 py-2 bg-primary rounded-lg text-primary-foreground">
-                <span className="block text-lg font-bold font-heading">12</span>
-                <span className="text-xs uppercase font-body">OCT</span>
-              </div>
-              <div>
-                <h4 className="font-bold text-primary leading-tight mb-1 font-heading">Final Examination Schedule for Honors 4th Year</h4>
-                <p className="text-sm text-muted-foreground font-body">Detailed timeline for the upcoming final assessments...</p>
-              </div>
-            </div>
-            <div className="p-6 bg-accent rounded-[12px] flex gap-6 items-start hover:bg-accent/80 transition-colors">
-              <div className="text-center px-4 py-2 bg-primary rounded-lg text-primary-foreground">
-                <span className="block text-lg font-bold font-heading">08</span>
-                <span className="text-xs uppercase font-body">OCT</span>
-              </div>
-              <div>
-                <h4 className="font-bold text-primary leading-tight mb-1 font-heading">Holiday Notice for Durga Puja & Lakshmi Puja</h4>
-                <p className="text-sm text-muted-foreground font-body">The college will remain closed from Oct 20th to Oct 28th...</p>
-              </div>
-            </div>
-            <div className="p-6 bg-accent rounded-[12px] flex gap-6 items-start hover:bg-accent/80 transition-colors">
-              <div className="text-center px-4 py-2 bg-primary rounded-lg text-primary-foreground">
-                <span className="block text-lg font-bold font-heading">05</span>
-                <span className="text-xs uppercase font-body">OCT</span>
-              </div>
-              <div>
-                <h4 className="font-bold text-primary leading-tight mb-1 font-heading">Orientation for HSC 1st Year Students</h4>
-                <p className="text-sm text-muted-foreground font-body">Welcome ceremony at the central auditorium starting 10:00 AM...</p>
-              </div>
-            </div>
+            {notices.map((notice, i) => (
+              <NoticeCard key={i} {...notice} />
+            ))}
           </div>
         </div>
+        
         {/* Principal's Message */}
         <div className="lg:col-span-7">
           <div className="relative bg-[#003366] text-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-full">
