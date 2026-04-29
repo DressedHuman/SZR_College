@@ -14,3 +14,8 @@ export async function getSession(): Promise<User | null> {
     return null;
   }
 }
+
+export async function getSessionToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get(TOKEN_KEY)?.value || null;
+}

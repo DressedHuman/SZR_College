@@ -90,3 +90,35 @@ export async function getEvents(): Promise<Event[]> {
   });
   return handleResponse<Event[]>(res);
 }
+
+export interface StudentProfile {
+  id: number;
+  user_id: number;
+  roll: string;
+  registration_no: string;
+  department: string;
+}
+
+export interface Result {
+  id: number;
+  student_id: number;
+  subject: string;
+  marks: number;
+  exam_type: string;
+}
+
+export async function getMyStudentProfile(token: string): Promise<StudentProfile> {
+  const res = await fetch(`${BASE_URL}/students/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return handleResponse<StudentProfile>(res);
+}
+
+export async function getMyResults(token: string): Promise<Result[]> {
+  const res = await fetch(`${BASE_URL}/results/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return handleResponse<Result[]>(res);
+}

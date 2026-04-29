@@ -9,6 +9,20 @@ from app.services.student import StudentService
 router = APIRouter()
 admin_only = RoleChecker([UserRole.admin])
 
+@router.get("/me", response_model=List[ResultResponse])
+async def get_my_results(
+    session: SessionDep,
+    current_user: CurrentUser,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100)
+):
+    """Get results for the currently logged-in student"""
+    student = await StudentService.get_student_by_user_id(session, current_user.id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+    skip = (page - 1) * limit
+    return await ResultService.get_results(session, skip=skip, limit=limit, student_id=student.id)
+
 @router.get("/", response_model=List[ResultResponse])
 async def get_results(
     session: SessionDep,
