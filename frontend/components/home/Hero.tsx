@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function Hero() {
   return (
@@ -24,9 +25,11 @@ export function Hero() {
             Empowering Future Leaders through excellence in education, character building, and community service since 1991.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-secondary text-primary px-8 py-4 rounded-[12px] font-bold text-lg hover:bg-secondary/90 transition-colors">
-              Apply Now
-            </button>
+            <Link href="/admission">
+              <button className="bg-secondary text-primary px-8 py-4 rounded-[12px] font-bold text-lg hover:bg-secondary/90 transition-colors">
+                Apply Now
+              </button>
+            </Link>
             <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-[12px] font-bold text-lg hover:bg-white/20 transition-colors">
               Explore Programs
             </button>

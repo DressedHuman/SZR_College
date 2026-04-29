@@ -123,6 +123,24 @@ export async function getMyResults(token: string): Promise<Result[]> {
   return handleResponse<Result[]>(res);
 }
 
+export interface AdmissionData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  previous_school: string;
+  marks_obtained: number;
+}
+
+export async function applyAdmission(data: AdmissionData) {
+  const res = await fetch(`${BASE_URL}/admissions/apply`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
 // Admin CRUD helpers
 
 function authHeaders(token: string) {

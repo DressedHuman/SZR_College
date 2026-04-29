@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, X, Loader2, Megaphone } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 export default function ManageNoticesPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [notices, setNotices] = React.useState<Notice[]>([])
   const [loading, setLoading] = React.useState(true)
   const [showForm, setShowForm] = React.useState(false)
@@ -66,13 +68,15 @@ export default function ManageNoticesPage() {
     try {
       if (editingId) {
         await adminUpdateNotice(token, editingId, { title, content, category })
+        showToast("Notice updated successfully", "success")
       } else {
         await adminCreateNotice(token, { title, content, category })
+        showToast("Notice created successfully", "success")
       }
       resetForm()
       await loadNotices()
     } catch (err: any) {
-      setError(err.message || "Failed to save notice")
+      showToast(err.message || "Failed to save notice", "error")
     } finally {
       setSubmitting(false)
     }
@@ -85,9 +89,10 @@ export default function ManageNoticesPage() {
 
     try {
       await adminDeleteNotice(token, id)
+      showToast("Notice deleted successfully", "success")
       await loadNotices()
     } catch (err: any) {
-      alert(err.message || "Failed to delete")
+      showToast(err.message || "Failed to delete", "error")
     }
   }
 
