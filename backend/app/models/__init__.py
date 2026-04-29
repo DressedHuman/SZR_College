@@ -7,4 +7,6 @@ from app.models.event import Event
 from app.models.result import Result
 from app.models.routine import Routine
 
+from app.models.admission import Admission
+
 # Import all models here so Alembic can discover them
