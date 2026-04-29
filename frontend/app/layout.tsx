@@ -12,9 +12,6 @@ const manrope = Manrope({
   subsets: ["latin"],
 });
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-
 export const metadata: Metadata = {
   title: "SZR College",
   description: "SZR College platform",
@@ -31,11 +28,7 @@ export default function RootLayout({
       className={`${inter.variable} ${manrope.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        {children}
       </body>
     </html>
   );
