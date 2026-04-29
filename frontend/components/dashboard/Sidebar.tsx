@@ -35,8 +35,10 @@ const studentLinks = [
 ]
 
 const adminLinks = [
-  { name: "Manage Users", href: "/dashboard/users", icon: Users },
   { name: "Manage Notices", href: "/dashboard/manage-notices", icon: FileText },
+  { name: "Manage Students", href: "/dashboard/manage-students", icon: Users },
+  { name: "Manage Teachers", href: "/dashboard/manage-teachers", icon: Users },
+  { name: "Manage Results", href: "/dashboard/manage-results", icon: GraduationCap },
 ]
 
 export function Sidebar({ userRole, userName }: SidebarProps) {

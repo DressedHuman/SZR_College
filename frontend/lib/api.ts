@@ -122,3 +122,74 @@ export async function getMyResults(token: string): Promise<Result[]> {
   });
   return handleResponse<Result[]>(res);
 }
+
+// Admin CRUD helpers
+
+function authHeaders(token: string) {
+  return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+}
+
+export async function adminGetStudents(token: string): Promise<StudentProfile[]> {
+  const res = await fetch(`${BASE_URL}/students/?limit=100`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return handleResponse<StudentProfile[]>(res);
+}
+
+export async function adminCreateNotice(token: string, data: { title: string; content: string; category: string }) {
+  const res = await fetch(`${BASE_URL}/notices/`, {
+    method: "POST", headers: authHeaders(token), body: JSON.stringify(data),
+  });
+  return handleResponse<Notice>(res);
+}
+
+export async function adminUpdateNotice(token: string, id: number, data: { title: string; content: string; category: string }) {
+  const res = await fetch(`${BASE_URL}/notices/${id}`, {
+    method: "PUT", headers: authHeaders(token), body: JSON.stringify(data),
+  });
+  return handleResponse<Notice>(res);
+}
+
+export async function adminDeleteNotice(token: string, id: number) {
+  const res = await fetch(`${BASE_URL}/notices/${id}`, {
+    method: "DELETE", headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse<{ message: string }>(res);
+}
+
+export async function adminDeleteStudent(token: string, id: number) {
+  const res = await fetch(`${BASE_URL}/students/${id}`, {
+    method: "DELETE", headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse<{ message: string }>(res);
+}
+
+export async function adminDeleteTeacher(token: string, id: number) {
+  const res = await fetch(`${BASE_URL}/teachers/${id}`, {
+    method: "DELETE", headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse<{ message: string }>(res);
+}
+
+export async function adminCreateResult(token: string, data: { student_id: number; subject: string; marks: number; exam_type: string }) {
+  const res = await fetch(`${BASE_URL}/results/`, {
+    method: "POST", headers: authHeaders(token), body: JSON.stringify(data),
+  });
+  return handleResponse<Result>(res);
+}
+
+export async function adminDeleteResult(token: string, id: number) {
+  const res = await fetch(`${BASE_URL}/results/${id}`, {
+    method: "DELETE", headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse<{ message: string }>(res);
+}
+
+export async function adminGetResults(token: string, roll: string): Promise<Result[]> {
+  const res = await fetch(`${BASE_URL}/results/?roll=${roll}&limit=100`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return handleResponse<Result[]>(res);
+}
