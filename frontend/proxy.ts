@@ -22,7 +22,7 @@ function decodeJwtPayload(token: string): Record<string, any> | null {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("szr_token")?.value;
   const { pathname } = request.nextUrl;
 
