@@ -33,7 +33,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+    # app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
     app.include_router(health.router, tags=["health"])
     app.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -45,7 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(students.router, prefix="/students", tags=["students"])
     app.include_router(results.router, prefix="/results", tags=["results"])
     
-    app.include_router(uploads.router, prefix="/upload", tags=["upload"])
+    app.include_router(uploads.router, prefix="/uploads", tags=["uploads"])
     app.include_router(admissions.router, prefix="/admissions", tags=["admissions"])
     
     return app
