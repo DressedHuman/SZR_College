@@ -6,11 +6,15 @@ from app.models.admission import AdmissionStatus
 from app.schemas.admission import AdmissionResponse, AdmissionCreate, AdmissionUpdate
 from app.services.admission import AdmissionService
 
+from app.core.limiter import limiter
+from fastapi import Request
+
 router = APIRouter()
 admin_only = RoleChecker([UserRole.admin])
 
 @router.post("/apply", response_model=AdmissionResponse)
-async def apply_admission(session: SessionDep, admission_in: AdmissionCreate):
+@limiter.limit("3/hour")
+async def apply_admission(request: Request, session: SessionDep, admission_in: AdmissionCreate):
     return await AdmissionService.create_admission(session, admission_in)
 
 @router.get("/", response_model=List[AdmissionResponse], dependencies=[Depends(admin_only)])

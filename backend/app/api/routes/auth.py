@@ -11,10 +11,15 @@ from app.models.user import User
 from app.schemas.token import Token
 from app.schemas.user import UserResponse
 
+from app.core.limiter import limiter
+from fastapi import Request
+
 router = APIRouter()
 
 @router.post("/login", response_model=Token)
+@limiter.limit("5/minute")
 async def login_access_token(
+    request: Request,
     session: SessionDep, 
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
