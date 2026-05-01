@@ -36,8 +36,8 @@ async def get_results(
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
         
-    # Validation logic: Students can only view their own results
-    if current_user.role == UserRole.student:
+    # Validation logic: Only admins can view any result; students can only view their own
+    if current_user.role != UserRole.admin:
         if student.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized to view these results")
 
