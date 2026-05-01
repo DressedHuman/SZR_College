@@ -1,44 +1,50 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { login, getCurrentUser } from "@/lib/api"
 import { saveToken } from "@/lib/auth"
 import { GraduationCap, Loader2, AlertCircle } from "lucide-react"
-import { useSearchParams } from "next/navigation"
-
 import { Suspense } from "react"
 
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) return;
+
+    setLoading(true);
+    setError(null);
 
     try {
-      const data = await login(email, password)
-      saveToken(data.access_token)
+      console.log("Submitting login for:", email);
+      const data = await login(email, password);
+      console.log("Authentication successful, saving token...");
+      saveToken(data.access_token);
 
-      const user = await getCurrentUser(data.access_token)
-      const from = searchParams.get("from")
-      const destination = from || (user.role === "admin" ? "/admin" : "/dashboard")
+      console.log("Fetching user profile...");
+      const user = await getCurrentUser(data.access_token);
       
-      router.push(destination)
-      router.refresh()
+      const from = searchParams.get("from");
+      const destination = from || (user.role === "admin" ? "/admin" : "/dashboard");
+      
+      console.log(`Login verified! Role: ${user.role}. Redirecting to: ${destination}`);
+      
+      // We use window.location.href to ensure the middleware/server-side picks up the new cookie
+      window.location.href = destination;
     } catch (err: any) {
-      setError(err.message || "Failed to sign in. Please check your credentials.")
-    } finally {
-      setLoading(false)
+      console.error("Login process error:", err);
+      setError(err.message || "Failed to sign in. Please check your credentials.");
+      setLoading(false);
     }
   }
 
@@ -62,14 +68,13 @@ function LoginContent() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-primary font-body" htmlFor="email">Email Address</label>
-                <Input 
+                <input 
                    id="email"
+                   name="email"
                    type="email" 
-                   placeholder="name@szrcollege.edu" 
+                   placeholder="admin@szrcollege.edu" 
                    required 
-                   value={email}
-                   onChange={(e) => setEmail(e.target.value)}
-                   className="rounded-xl h-12 focus-visible:ring-primary font-body"
+                   className="flex h-12 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-body"
                 />
               </div>
               <div className="space-y-2">
@@ -77,13 +82,13 @@ function LoginContent() {
                   <label className="text-sm font-semibold text-primary font-body" htmlFor="password">Password</label>
                   <a className="text-xs font-bold text-secondary hover:underline font-body" href="#">Forgot Password?</a>
                 </div>
-                <Input 
+                <input 
                    id="password"
+                   name="password"
                    type="password" 
                    required 
-                   value={password}
-                   onChange={(e) => setPassword(e.target.value)}
-                   className="rounded-xl h-12 focus-visible:ring-primary font-body"
+                   placeholder="••••••••"
+                   className="flex h-12 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-body"
                 />
               </div>
 
@@ -94,16 +99,18 @@ function LoginContent() {
                 </div>
               )}
 
-              <Button 
+              <button 
                 type="submit" 
-                className="w-full h-12 rounded-xl text-md font-bold shadow-lg hover:shadow-xl transition-all"
+                className="w-full h-12 rounded-xl text-md font-bold shadow-lg hover:shadow-xl transition-all bg-primary text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? (
-                  <Loader2 className="animate-spin mr-2" size={20} />
-                ) : null}
-                {loading ? "Signing in..." : "Sign In"}
-              </Button>
+                  <>
+                    <Loader2 className="animate-spin mr-2" size={20} />
+                    Signing in...
+                  </>
+                ) : "Sign In"}
+              </button>
             </form>
           </CardContent>
           <CardFooter className="bg-accent/50 border-t border-border py-4 flex justify-center">
@@ -123,7 +130,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={48} /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       <LoginContent />
     </Suspense>
   )
