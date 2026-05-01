@@ -16,13 +16,13 @@ async def get_my_student_profile(session: SessionDep, current_user: CurrentUser)
         raise HTTPException(status_code=404, detail="Student profile not found")
     return student
 
-@router.get("/", response_model=List[StudentResponse])
-async def get_students(session: SessionDep, current_user: CurrentUser, page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)):
+@router.get("/", response_model=List[StudentResponse], dependencies=[Depends(admin_only)])
+async def get_students(session: SessionDep, page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)):
     skip = (page - 1) * limit
     return await StudentService.get_students(session, skip=skip, limit=limit)
 
-@router.get("/{student_id}", response_model=StudentResponse)
-async def get_student(session: SessionDep, current_user: CurrentUser, student_id: int):
+@router.get("/{student_id}", response_model=StudentResponse, dependencies=[Depends(admin_only)])
+async def get_student(session: SessionDep, student_id: int):
     student = await StudentService.get_student(session, student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
