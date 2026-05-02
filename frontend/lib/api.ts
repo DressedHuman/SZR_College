@@ -75,7 +75,7 @@ export async function getCurrentUser(token: string): Promise<User> {
 
 export async function getNotices(): Promise<Notice[]> {
   const res = await fetch(`${BASE_URL}/notices/`, { 
-    next: { revalidate: 60 } 
+    cache: "no-store"
   });
   return handleResponse<Notice[]>(res);
 }
