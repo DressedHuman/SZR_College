@@ -14,7 +14,7 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  if (user.role === "admin") {
+  if (String(user.role).toLowerCase() === "admin") {
     redirect("/admin")
   }
 

@@ -7,7 +7,9 @@ import Link from "next/link"
 
 export default async function AdminDashboardPage() {
   const user = await getSession()
-  if (!user || user.role !== "admin") redirect("/login")
+  if (!user || String(user.role).toLowerCase() !== "admin") {
+    redirect("/login")
+  }
 
   const token = await getSessionToken()
 

@@ -14,7 +14,10 @@ export default async function AdminLayout({
     redirect("/login")
   }
 
-  if (user.role !== "admin") {
+  console.log("Admin Layout Check - Role:", user.role);
+
+  if (String(user.role).toLowerCase() !== "admin") {
+    console.log("Not an admin, redirecting to dashboard...");
     redirect("/dashboard")
   }
 
