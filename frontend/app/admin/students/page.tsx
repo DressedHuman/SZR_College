@@ -6,8 +6,10 @@ import { adminGetStudents, adminDeleteStudent } from "@/lib/api"
 import type { StudentProfile } from "@/lib/api"
 import { Trash2, Users, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/toast"
 
-export default function ManageStudentsPage() {
+export default function AdminStudentsPage() {
+  const { showToast } = useToast()
   const [students, setStudents] = React.useState<StudentProfile[]>([])
   const [loading, setLoading] = React.useState(true)
   const [search, setSearch] = React.useState("")
@@ -35,9 +37,10 @@ export default function ManageStudentsPage() {
     if (!token) return
     try {
       await adminDeleteStudent(token, id)
+      showToast("Student record deleted", "success")
       await loadStudents()
     } catch (err: any) {
-      alert(err.message || "Failed to delete")
+      showToast(err.message || "Failed to delete", "error")
     }
   }
 

@@ -13,8 +13,6 @@ import {
   GraduationCap,
   Settings,
   LogOut,
-  Users,
-  FileText,
   X,
   Menu,
   ChevronLeft,
@@ -34,13 +32,6 @@ const studentLinks = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
-const adminLinks = [
-  { name: "Manage Notices", href: "/dashboard/manage-notices", icon: FileText },
-  { name: "Manage Students", href: "/dashboard/manage-students", icon: Users },
-  { name: "Manage Teachers", href: "/dashboard/manage-teachers", icon: Users },
-  { name: "Manage Results", href: "/dashboard/manage-results", icon: GraduationCap },
-]
-
 export function Sidebar({ userRole, userName }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -52,10 +43,6 @@ export function Sidebar({ userRole, userName }: SidebarProps) {
     router.refresh()
   }
 
-  const links = userRole === "admin"
-    ? [...studentLinks.slice(0, 1), ...adminLinks, ...studentLinks.slice(1)]
-    : studentLinks
-
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Brand */}
@@ -66,13 +53,13 @@ export function Sidebar({ userRole, userName }: SidebarProps) {
         </Link>
         <div className="mt-6">
           <h2 className="text-lg font-heading font-bold text-primary tracking-tight">SZRC Portal</h2>
-          <p className="text-xs text-muted-foreground font-body">Academic Management</p>
+          <p className="text-xs text-muted-foreground font-body">Student Dashboard</p>
         </div>
       </div>
 
       {/* Nav Links */}
       <nav className="flex-1 px-3 space-y-1">
-        {links.map((link) => {
+        {studentLinks.map((link) => {
           const isActive = pathname === link.href
           return (
             <Link

@@ -6,8 +6,10 @@ import { getTeachers, adminDeleteTeacher } from "@/lib/api"
 import type { Teacher } from "@/lib/api"
 import { Trash2, Users, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/toast"
 
-export default function ManageTeachersPage() {
+export default function AdminTeachersPage() {
+  const { showToast } = useToast()
   const [teachers, setTeachers] = React.useState<Teacher[]>([])
   const [loading, setLoading] = React.useState(true)
   const [search, setSearch] = React.useState("")
@@ -33,9 +35,10 @@ export default function ManageTeachersPage() {
     if (!token) return
     try {
       await adminDeleteTeacher(token, id)
+      showToast("Teacher record deleted", "success")
       await loadTeachers()
     } catch (err: any) {
-      alert(err.message || "Failed to delete")
+      showToast(err.message || "Failed to delete", "error")
     }
   }
 
@@ -54,22 +57,14 @@ export default function ManageTeachersPage() {
         </div>
         <div className="relative w-full sm:w-72">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, department..."
-            className="pl-9"
-          />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, department..." className="pl-9" />
         </div>
       </div>
-
       <div className="bg-white rounded-2xl border border-border/30 overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground font-body">Loading teachers...</div>
         ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground font-body">
-            {search ? "No matching teachers." : "No teachers registered yet."}
-          </div>
+          <div className="p-12 text-center text-muted-foreground font-body">{search ? "No matching teachers." : "No teachers registered yet."}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Plus, Pencil, Trash2, X, Loader2, Megaphone } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
-export default function ManageNoticesPage() {
+export default function AdminNoticesPage() {
   const router = useRouter()
   const { showToast } = useToast()
   const [notices, setNotices] = React.useState<Notice[]>([])

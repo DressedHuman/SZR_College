@@ -6,9 +6,11 @@ import { adminGetStudents, adminGetResults, adminCreateResult, adminDeleteResult
 import type { StudentProfile, Result } from "@/lib/api"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { GraduationCap, Plus, Trash2, X, Loader2, Search } from "lucide-react"
+import { GraduationCap, Plus, Trash2, X, Loader2 } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
-export default function ManageResultsPage() {
+export default function AdminResultsPage() {
+  const { showToast } = useToast()
   const [students, setStudents] = React.useState<StudentProfile[]>([])
   const [results, setResults] = React.useState<Result[]>([])
   const [selectedRoll, setSelectedRoll] = React.useState("")
@@ -17,14 +19,11 @@ export default function ManageResultsPage() {
   const [showForm, setShowForm] = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
-
   const [subject, setSubject] = React.useState("")
   const [marks, setMarks] = React.useState("")
   const [examType, setExamType] = React.useState("Midterm")
 
-  React.useEffect(() => {
-    loadStudents()
-  }, [])
+  React.useEffect(() => { loadStudents() }, [])
 
   async function loadStudents() {
     const token = getToken()
@@ -45,7 +44,7 @@ export default function ManageResultsPage() {
     try {
       const data = await adminGetResults(token, roll)
       setResults(data)
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to load results:", err)
     } finally {
       setLoading(false)
@@ -66,20 +65,12 @@ export default function ManageResultsPage() {
     if (!selectedStudentId) return
     const token = getToken()
     if (!token) return
-
     setSubmitting(true)
     setError(null)
     try {
-      await adminCreateResult(token, {
-        student_id: selectedStudentId,
-        subject,
-        marks: parseFloat(marks),
-        exam_type: examType,
-      })
-      setSubject("")
-      setMarks("")
-      setExamType("Midterm")
-      setShowForm(false)
+      await adminCreateResult(token, { student_id: selectedStudentId, subject, marks: parseFloat(marks), exam_type: examType })
+      showToast("Result added successfully", "success")
+      setSubject(""); setMarks(""); setExamType("Midterm"); setShowForm(false)
       await loadResults(selectedRoll)
     } catch (err: any) {
       setError(err.message || "Failed to add result")
@@ -94,33 +85,25 @@ export default function ManageResultsPage() {
     if (!token) return
     try {
       await adminDeleteResult(token, id)
+      showToast("Result deleted", "success")
       await loadResults(selectedRoll)
     } catch (err: any) {
-      alert(err.message || "Failed to delete")
+      showToast(err.message || "Failed to delete", "error")
     }
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-          <GraduationCap size={20} className="text-primary" />
-          <h1 className="text-2xl font-heading font-bold text-primary">Manage Results</h1>
-        </div>
+      <div className="flex items-center gap-2">
+        <GraduationCap size={20} className="text-primary" />
+        <h1 className="text-2xl font-heading font-bold text-primary">Manage Results</h1>
       </div>
 
-      {/* Student Selector */}
       <div className="bg-white rounded-2xl p-6 border border-border/30">
         <label className="text-sm font-semibold text-primary font-body block mb-2">Select Student</label>
-        <select
-          value={selectedRoll}
-          onChange={handleStudentSelect}
-          className="w-full sm:w-80 bg-[#e1e3e4] text-primary font-body text-sm rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
-        >
+        <select value={selectedRoll} onChange={handleStudentSelect} className="w-full sm:w-80 bg-[#e1e3e4] text-primary font-body text-sm rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors">
           <option value="">-- Select a student --</option>
-          {students.map(s => (
-            <option key={s.id} value={s.roll}>{s.roll} — {s.department}</option>
-          ))}
+          {students.map(s => (<option key={s.id} value={s.roll}>{s.roll} — {s.department}</option>))}
         </select>
       </div>
 
@@ -131,20 +114,15 @@ export default function ManageResultsPage() {
               Showing results for <span className="font-bold text-primary">{selectedRoll}</span>
             </p>
             {!showForm && (
-              <Button onClick={() => setShowForm(true)} className="gap-2">
-                <Plus size={16} /> Add Result
-              </Button>
+              <Button onClick={() => setShowForm(true)} className="gap-2"><Plus size={16} /> Add Result</Button>
             )}
           </div>
 
-          {/* Add Result Form */}
           {showForm && (
             <div className="bg-white rounded-2xl p-6 border border-border/30">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-heading font-bold text-primary">Add Result</h2>
-                <button onClick={() => { setShowForm(false); setError(null) }} className="text-muted-foreground hover:text-primary">
-                  <X size={20} />
-                </button>
+                <button onClick={() => { setShowForm(false); setError(null) }} className="text-muted-foreground hover:text-primary"><X size={20} /></button>
               </div>
               <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -163,16 +141,13 @@ export default function ManageResultsPage() {
                   {error && <p className="text-sm text-destructive font-body self-center">{error}</p>}
                   <div className="ml-auto flex gap-3">
                     <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-                    <Button type="submit" disabled={submitting} className="gap-2">
-                      {submitting && <Loader2 size={16} className="animate-spin" />} Save
-                    </Button>
+                    <Button type="submit" disabled={submitting} className="gap-2">{submitting && <Loader2 size={16} className="animate-spin" />} Save</Button>
                   </div>
                 </div>
               </form>
             </div>
           )}
 
-          {/* Results Table */}
           <div className="bg-white rounded-2xl border border-border/30 overflow-hidden">
             {loading ? (
               <div className="p-12 text-center text-muted-foreground font-body">Loading results...</div>
@@ -197,9 +172,7 @@ export default function ManageResultsPage() {
                         <td className="py-3 px-4 text-muted-foreground capitalize hidden sm:table-cell">{result.exam_type}</td>
                         <td className="py-3 px-4">
                           <div className="flex items-center justify-end">
-                            <button onClick={() => handleDelete(result.id)} className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive">
-                              <Trash2 size={14} />
-                            </button>
+                            <button onClick={() => handleDelete(result.id)} className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
                           </div>
                         </td>
                       </tr>
