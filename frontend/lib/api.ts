@@ -100,6 +100,7 @@ export interface StudentProfile {
   roll: string;
   registration_no: string;
   department: string;
+  user?: User;
 }
 
 export interface Result {
@@ -184,6 +185,20 @@ export async function adminDeleteStudent(token: string, id: number) {
     method: "DELETE", headers: { Authorization: `Bearer ${token}` },
   });
   return handleResponse<{ message: string }>(res);
+}
+
+export async function adminCreateStudent(token: string, data: any) {
+  const res = await fetch(`${BASE_URL}/students/full`, {
+    method: "POST", headers: authHeaders(token), body: JSON.stringify(data),
+  });
+  return handleResponse<StudentProfile>(res);
+}
+
+export async function adminUpdateStudent(token: string, id: number, data: any) {
+  const res = await fetch(`${BASE_URL}/students/${id}`, {
+    method: "PUT", headers: authHeaders(token), body: JSON.stringify(data),
+  });
+  return handleResponse<StudentProfile>(res);
 }
 
 export async function adminDeleteTeacher(token: string, id: number) {

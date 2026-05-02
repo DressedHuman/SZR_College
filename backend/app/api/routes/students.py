@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.api.deps import SessionDep, CurrentUser, RoleChecker
 from app.models.user import UserRole
-from app.schemas.student import StudentResponse, StudentCreate
+from app.schemas.student import StudentResponse, StudentCreate, StudentFullCreate, StudentWithUser
 from app.services.student import StudentService
 
 router = APIRouter()
@@ -16,7 +16,7 @@ async def get_my_student_profile(session: SessionDep, current_user: CurrentUser)
         raise HTTPException(status_code=404, detail="Student profile not found")
     return student
 
-@router.get("/", response_model=List[StudentResponse], dependencies=[Depends(admin_only)])
+@router.get("/", response_model=List[StudentWithUser], dependencies=[Depends(admin_only)])
 async def get_students(session: SessionDep, page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)):
     skip = (page - 1) * limit
     return await StudentService.get_students(session, skip=skip, limit=limit)
@@ -31,6 +31,10 @@ async def get_student(session: SessionDep, student_id: int):
 @router.post("/", response_model=StudentResponse, dependencies=[Depends(admin_only)])
 async def create_student(session: SessionDep, student_in: StudentCreate):
     return await StudentService.create_student(session, student_in)
+
+@router.post("/full", response_model=StudentResponse, dependencies=[Depends(admin_only)])
+async def create_student_full(session: SessionDep, student_in: StudentFullCreate):
+    return await StudentService.create_student_full(session, student_in)
 
 @router.put("/{student_id}", response_model=StudentResponse, dependencies=[Depends(admin_only)])
 async def update_student(session: SessionDep, student_id: int, student_in: StudentCreate):
