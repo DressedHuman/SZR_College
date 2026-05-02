@@ -1,0 +1,37 @@
+{
+  "project": "SZR College Management System",
+  "stack": {
+    "backend": "FastAPI, SQLAlchemy, SQLite, Pydantic",
+    "frontend": "Next.js 15+, TailwindCSS, Lucide Icons",
+    "auth": "JWT via cookies (szr_token)"
+  },
+  "backend_structure": {
+    "root": "/backend",
+    "core": "app/main.py (Uvicorn:8000)",
+    "models": ["User", "Student", "Teacher", "Notice", "Result", "Event", "Admission", "Routine"],
+    "api_routes": [
+      "/auth (login, me)",
+      "/students (me, CRUD)",
+      "/teachers (list, CRUD)",
+      "/notices (list, CRUD)",
+      "/results (me, roll-search, CRUD)",
+      "/events (list, CRUD)",
+      "/admissions (apply)",
+      "/uploads (file-handling)"
+    ]
+  },
+  "frontend_structure": {
+    "root": "/frontend",
+    "routing": {
+      "public": "/(site) - Home, Login, Admission, Gallery",
+      "student": "/dashboard - Overview, Results, Routine, Notices, Profile (Role restricted)",
+      "admin": "/admin - Full Management: Notices, Students, Teachers, Results, Site-Content (Role restricted)"
+    },
+    "key_components": {
+      "layout": "Navbar/Footer (Public), Sidebar (Student), AdminSidebar (Admin)",
+      "shared": "UI components (Button, Input, Card, Toast)"
+    },
+    "lib": "api.ts (fetch wrapper), auth.ts (client auth), session.ts (server auth)"
+  },
+  "architectural_notes": "Separated Dashboard (student) and Admin Panel. Admin routes under /admin use a dark-themed layout. Auth guards implemented in layout.tsx files using getSession(). Frontend communicates with FastAPI backend via proxy.ts/api.ts."
+}
