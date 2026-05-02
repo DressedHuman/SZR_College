@@ -6,7 +6,7 @@ from app.schemas.notice import NoticeCreate
 class NoticeService:
     @staticmethod
     async def get_notices(session: AsyncSession, skip: int = 0, limit: int = 100, category: str = None):
-        stmt = select(Notice).offset(skip).limit(limit)
+        stmt = select(Notice).order_by(Notice.published_at.desc()).offset(skip).limit(limit)
         if category:
             stmt = stmt.where(Notice.category == category)
         result = await session.execute(stmt)

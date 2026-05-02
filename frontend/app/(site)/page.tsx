@@ -15,7 +15,7 @@ export default async function Home() {
       getEvents()
     ]);
 
-    notices = rawNotices.slice(0, 5).map(n => {
+    notices = rawNotices.slice(0, 6).map(n => {
       const date = new Date(n.published_at);
       return {
         day: date.getDate().toString().padStart(2, '0'),

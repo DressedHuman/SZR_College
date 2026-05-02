@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   let allTeachers: Teacher[] = []
 
   try {
-    notices = (await getNotices()).slice(0, 3)
+    notices = await getNotices()
   } catch (err) {
     console.error("Failed to fetch notices:", err)
   }
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
             </div>
             <div className="space-y-3">
               {notices.length > 0 ? (
-                notices.map((notice, i) => (
+                notices.slice(0, 3).map((notice, i) => (
                   <div key={notice.id || i} className="p-3 bg-[#f3f4f5] rounded-[12px]">
                     <p className="text-sm font-bold text-primary font-heading truncate">{notice.title}</p>
                     <p className="text-xs text-muted-foreground font-body truncate">{notice.content}</p>
@@ -272,7 +272,7 @@ export default async function DashboardPage() {
           </div>
           <div className="space-y-4">
             {notices.length > 0 ? (
-              notices.map((notice, i) => {
+              notices.slice(0, 5).map((notice, i) => {
                 const date = new Date(notice.published_at)
                 return (
                   <div key={notice.id || i} className="p-4 bg-[#f3f4f5] rounded-[12px] hover:bg-[#edeeef] transition-colors">
