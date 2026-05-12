@@ -13,6 +13,7 @@ from app.api.routes import students
 from app.api.routes import results
 from app.api.routes import uploads
 from app.api.routes import admissions
+from app.api.routes import site_content
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -47,6 +48,7 @@ def create_app() -> FastAPI:
     
     app.include_router(uploads.router, prefix="/uploads", tags=["uploads"])
     app.include_router(admissions.router, prefix="/admissions", tags=["admissions"])
+    app.include_router(site_content.router, prefix="/site-content", tags=["site-content"])
     
     return app
 

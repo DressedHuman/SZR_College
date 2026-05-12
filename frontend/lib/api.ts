@@ -229,3 +229,35 @@ export async function adminGetResults(token: string, roll: string): Promise<Resu
   });
   return handleResponse<Result[]>(res);
 }
+
+export interface SiteContent {
+  college_name: string;
+  tagline: string;
+  hero_heading: string;
+  hero_subtext: string;
+  hero_image_url: string;
+  college_logo_url: string;
+  principal_name: string;
+  principal_designation: string;
+  principal_message: string;
+  principal_photo_url: string;
+  contact_email: string;
+  contact_phone: string;
+  address: string;
+}
+
+export async function getSiteContent(): Promise<SiteContent> {
+  const res = await fetch(`${BASE_URL}/site-content/`, {
+    next: { revalidate: 60 },
+  });
+  return handleResponse<SiteContent>(res);
+}
+
+export async function adminUpdateSiteContent(token: string, data: SiteContent): Promise<SiteContent> {
+  const res = await fetch(`${BASE_URL}/site-content/`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<SiteContent>(res);
+}

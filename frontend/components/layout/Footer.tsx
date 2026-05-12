@@ -2,14 +2,24 @@ import * as React from "react"
 import Link from "next/link"
 import { Globe, Users, MessageSquare, MapPin, Phone, Mail } from "lucide-react"
 
-export function Footer() {
+export function Footer({
+  collegeName,
+  address,
+  contactPhone,
+  contactEmail,
+}: {
+  collegeName?: string;
+  address?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+}) {
   return (
     <footer className="bg-accent/50 w-full rounded-t-[1.5rem] mt-12 pt-16">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 md:px-12 pb-16 max-w-7xl mx-auto w-full">
         {/* Column 1 */}
         <div className="space-y-6">
           <div className="text-lg font-black text-primary">
-            Shahid Ziaur Rahman College
+            {collegeName ?? "Shahid Ziaur Rahman College"}
           </div>
           <p className="text-muted-foreground font-body text-sm leading-relaxed">
             A premier educational institution in Dimla, Nilphamari, dedicated to academic brilliance and holistic student development.
@@ -55,15 +65,15 @@ export function Footer() {
           <ul className="space-y-4 text-sm font-body">
             <li className="flex gap-3 text-muted-foreground">
               <MapPin className="text-primary" size={18} />
-              <span>Dimla, Nilphamari, Bangladesh</span>
+              <span>{address ?? "Dimla, Nilphamari, Bangladesh"}</span>
             </li>
             <li className="flex gap-3 text-muted-foreground">
               <Phone className="text-primary" size={18} />
-              <span>+880 1234 567890</span>
+              <span>{contactPhone ?? "+880 1234 567890"}</span>
             </li>
             <li className="flex gap-3 text-muted-foreground">
               <Mail className="text-primary" size={18} />
-              <span>info@szrcollege.edu.bd</span>
+              <span>{contactEmail ?? "info@szrcollege.edu.bd"}</span>
             </li>
           </ul>
         </div>
@@ -71,7 +81,7 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto px-8 md:px-12 py-8 border-t border-border">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground font-body text-xs">
-          <div>© 2024 Shahid Ziaur Rahman College. All Rights Reserved.</div>
+          <div>© 2024 {collegeName ?? "Shahid Ziaur Rahman College"}. All Rights Reserved.</div>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-primary">Privacy Policy</Link>
             <Link href="#" className="hover:text-primary">Terms of Service</Link>

@@ -1,69 +1,59 @@
 "use client"
 
 import * as React from "react"
-import { Globe, Image, MessageSquare, Layout, Save, Loader2, Upload } from "lucide-react"
+import { Globe, Image, MessageSquare, Layout, Save, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/toast"
+import { getSiteContent, adminUpdateSiteContent, SiteContent } from "@/lib/api"
+import { getToken } from "@/lib/auth"
 
-interface SiteContentState {
-  collegeName: string
-  tagline: string
-  heroHeading: string
-  heroSubtext: string
-  principalName: string
-  principalDesignation: string
-  principalMessage: string
-  principalPhotoUrl: string
-  collegeLogoUrl: string
-  heroImageUrl: string
-  contactEmail: string
-  contactPhone: string
-  address: string
-}
-
-const defaultContent: SiteContentState = {
-  collegeName: "Shahid Ziaur Rahman College",
+const defaultContent: SiteContent = {
+  college_name: "Shahid Ziaur Rahman College",
   tagline: "Empowering Future Leaders through excellence in education, character building, and community service since 1991.",
-  heroHeading: "Shahid Ziaur Rahman College",
-  heroSubtext: "Empowering Future Leaders through excellence in education, character building, and community service since 1991.",
-  principalName: "Prof. Dr. Zahirul Haque",
-  principalDesignation: "Principal, SZR College",
-  principalMessage: "Our mission at SZR College is to nurture curiosity and foster integrity. We don't just teach curricula; we shape the visionary leaders of tomorrow's Bangladesh.",
-  principalPhotoUrl: "",
-  collegeLogoUrl: "",
-  heroImageUrl: "",
-  contactEmail: "info@szrcollege.edu",
-  contactPhone: "+880-1234-567890",
+  hero_heading: "Shahid Ziaur Rahman College",
+  hero_subtext: "Empowering Future Leaders through excellence in education, character building, and community service since 1991.",
+  principal_name: "Prof. Dr. Zahirul Haque",
+  principal_designation: "Principal, SZR College",
+  principal_message: "Our mission at SZR College is to nurture curiosity and foster integrity. We don't just teach curricula; we shape the visionary leaders of tomorrow's Bangladesh.",
+  principal_photo_url: "",
+  college_logo_url: "",
+  hero_image_url: "",
+  contact_email: "info@szrcollege.edu",
+  contact_phone: "+880-1234-567890",
   address: "Dimla, Nilphamari, Bangladesh",
 }
 
 export default function SiteContentPage() {
   const { showToast } = useToast()
-  const [content, setContent] = React.useState<SiteContentState>(defaultContent)
+  const [content, setContent] = React.useState<SiteContent>(defaultContent)
+  const [loading, setLoading] = React.useState(true)
   const [saving, setSaving] = React.useState(false)
   const [activeTab, setActiveTab] = React.useState<"general" | "hero" | "principal" | "contact">("general")
 
   React.useEffect(() => {
-    const saved = localStorage.getItem("szr_site_content")
-    if (saved) {
-      try {
-        setContent({ ...defaultContent, ...JSON.parse(saved) })
-      } catch { /* use defaults */ }
-    }
+    getSiteContent()
+      .then(data => setContent(data))
+      .catch(() => { /* keep defaults */ })
+      .finally(() => setLoading(false))
   }, [])
 
-  function updateField(field: keyof SiteContentState, value: string) {
+  function updateField(field: keyof SiteContent, value: string) {
     setContent(prev => ({ ...prev, [field]: value }))
   }
 
   async function handleSave() {
+    const token = getToken()
+    if (!token) {
+      showToast("Not authenticated", "error")
+      return
+    }
     setSaving(true)
     try {
-      localStorage.setItem("szr_site_content", JSON.stringify(content))
+      await adminUpdateSiteContent(token, content)
       showToast("Site content saved successfully", "success")
-    } catch (err) {
+    } catch {
       showToast("Failed to save content", "error")
     } finally {
       setSaving(false)
@@ -76,6 +66,14 @@ export default function SiteContentPage() {
     { id: "principal" as const, label: "Principal", icon: MessageSquare },
     { id: "contact" as const, label: "Contact", icon: Globe },
   ]
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 size={24} className="animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -118,7 +116,7 @@ export default function SiteContentPage() {
           <h2 className="text-lg font-heading font-bold text-primary">General Settings</h2>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">College Name</label>
-            <Input value={content.collegeName} onChange={e => updateField("collegeName", e.target.value)} />
+            <Input value={content.college_name} onChange={e => updateField("college_name", e.target.value)} />
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Tagline</label>
@@ -126,7 +124,7 @@ export default function SiteContentPage() {
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">College Logo URL</label>
-            <Input value={content.collegeLogoUrl} onChange={e => updateField("collegeLogoUrl", e.target.value)} placeholder="https://..." />
+            <Input value={content.college_logo_url} onChange={e => updateField("college_logo_url", e.target.value)} placeholder="https://..." />
             <p className="text-xs text-muted-foreground mt-1 font-body">Paste a direct image URL for the college logo</p>
           </div>
         </div>
@@ -138,15 +136,15 @@ export default function SiteContentPage() {
           <h2 className="text-lg font-heading font-bold text-primary">Hero Section</h2>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Heading</label>
-            <Input value={content.heroHeading} onChange={e => updateField("heroHeading", e.target.value)} />
+            <Input value={content.hero_heading} onChange={e => updateField("hero_heading", e.target.value)} />
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Subtext</label>
-            <Textarea value={content.heroSubtext} onChange={e => updateField("heroSubtext", e.target.value)} rows={3} />
+            <Textarea value={content.hero_subtext} onChange={e => updateField("hero_subtext", e.target.value)} rows={3} />
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Background Image URL</label>
-            <Input value={content.heroImageUrl} onChange={e => updateField("heroImageUrl", e.target.value)} placeholder="https://..." />
+            <Input value={content.hero_image_url} onChange={e => updateField("hero_image_url", e.target.value)} placeholder="https://..." />
             <p className="text-xs text-muted-foreground mt-1 font-body">Recommended size: 1920×1080 or larger</p>
           </div>
         </div>
@@ -159,20 +157,20 @@ export default function SiteContentPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold text-primary font-body block mb-1">Name</label>
-              <Input value={content.principalName} onChange={e => updateField("principalName", e.target.value)} />
+              <Input value={content.principal_name} onChange={e => updateField("principal_name", e.target.value)} />
             </div>
             <div>
               <label className="text-sm font-semibold text-primary font-body block mb-1">Designation</label>
-              <Input value={content.principalDesignation} onChange={e => updateField("principalDesignation", e.target.value)} />
+              <Input value={content.principal_designation} onChange={e => updateField("principal_designation", e.target.value)} />
             </div>
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Message</label>
-            <Textarea value={content.principalMessage} onChange={e => updateField("principalMessage", e.target.value)} rows={4} />
+            <Textarea value={content.principal_message} onChange={e => updateField("principal_message", e.target.value)} rows={4} />
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Photo URL</label>
-            <Input value={content.principalPhotoUrl} onChange={e => updateField("principalPhotoUrl", e.target.value)} placeholder="https://..." />
+            <Input value={content.principal_photo_url} onChange={e => updateField("principal_photo_url", e.target.value)} placeholder="https://..." />
           </div>
         </div>
       )}
@@ -183,11 +181,11 @@ export default function SiteContentPage() {
           <h2 className="text-lg font-heading font-bold text-primary">Contact Information</h2>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Email</label>
-            <Input type="email" value={content.contactEmail} onChange={e => updateField("contactEmail", e.target.value)} />
+            <Input type="email" value={content.contact_email} onChange={e => updateField("contact_email", e.target.value)} />
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Phone</label>
-            <Input value={content.contactPhone} onChange={e => updateField("contactPhone", e.target.value)} />
+            <Input value={content.contact_phone} onChange={e => updateField("contact_phone", e.target.value)} />
           </div>
           <div>
             <label className="text-sm font-semibold text-primary font-body block mb-1">Address</label>

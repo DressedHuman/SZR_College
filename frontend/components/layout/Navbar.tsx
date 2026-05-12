@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils"
 import { getToken, removeToken } from "@/lib/auth"
 import { getCurrentUser, User } from "@/lib/api"
 
-export function Navbar() {
+export function Navbar({ collegeName }: { collegeName?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [user, setUser] = React.useState<User | null>(null)
   const pathname = usePathname()
@@ -47,7 +47,7 @@ export function Navbar() {
     <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md shadow-sm">
       <nav className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto w-full">
         <Link href="/" className="text-xl font-bold tracking-tighter text-primary">
-          Shahid Ziaur Rahman College
+          {collegeName ?? "Shahid Ziaur Rahman College"}
         </Link>
         
         {/* Desktop Menu */}

@@ -3,11 +3,20 @@ import { QuickLinks } from "@/components/home/QuickLinks"
 import { NoticesAndMessage } from "@/components/home/NoticesAndMessage"
 import { EventsPreview } from "@/components/home/EventsPreview"
 import { GalleryPreview } from "@/components/home/GalleryPreview"
-import { getNotices, getEvents } from "@/lib/api"
+import { getNotices, getEvents, getSiteContent, SiteContent } from "@/lib/api"
+
+const DEFAULT_PRINCIPAL_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuBpoSpoNXmuSafFICYGSA79YIbtjUVXVqxoJooFqpAUSvDWz2ZsUT6H1VZgX9xbIr6b9_rdeWVfjbaBCNO_EeZc5eEiHnp6sZ3r4xpOVBKhL7XJsG3SQV80q0LpA4KTxNwcpIsDO8fmuKhq-1v4swT0nDmDSF2PuSAO9awjFF5420uMN_YznjEdkz-K7L08KvdoeFyejdf1Owz7e2Tzp_MMserhyOq0wODpM5rL7Mbdv0quPD209dKXhvslSPCmarOBlKPh33p2nBA"
 
 export default async function Home() {
   let notices: any[] = [];
   let events: any[] = [];
+
+  let siteContent: SiteContent | null = null;
+  try {
+    siteContent = await getSiteContent();
+  } catch {
+    // use hardcoded fallbacks below
+  }
 
   try {
     const [rawNotices, rawEvents] = await Promise.all([
@@ -40,10 +49,10 @@ export default async function Home() {
   }
 
   const principalMessage = {
-    imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBpoSpoNXmuSafFICYGSA79YIbtjUVXVqxoJooFqpAUSvDWz2ZsUT6H1VZgX9xbIr6b9_rdeWVfjbaBCNO_EeZc5eEiHnp6sZ3r4xpOVBKhL7XJsG3SQV80q0LpA4KTxNwcpIsDO8fmuKhq-1v4swT0nDmDSF2PuSAO9awjFF5420uMN_YznjEdkz-K7L08KvdoeFyejdf1Owz7e2Tzp_MMserhyOq0wODpM5rL7Mbdv0quPD209dKXhvslSPCmarOBlKPh33p2nBA",
-    quote: "Our mission at SZR College is to nurture curiosity and foster integrity. We don't just teach curricula; we shape the visionary leaders of tomorrow's Bangladesh.",
-    name: "Prof. Dr. Zahirul Haque",
-    designation: "Principal, SZR College"
+    imageSrc: siteContent?.principal_photo_url || DEFAULT_PRINCIPAL_PHOTO,
+    quote: siteContent?.principal_message ?? "Our mission at SZR College is to nurture curiosity and foster integrity. We don't just teach curricula; we shape the visionary leaders of tomorrow's Bangladesh.",
+    name: siteContent?.principal_name ?? "Prof. Dr. Zahirul Haque",
+    designation: siteContent?.principal_designation ?? "Principal, SZR College",
   }
 
   const galleryData = {
@@ -73,7 +82,12 @@ export default async function Home() {
 
   return (
     <>
-      <Hero />
+      <Hero
+        heading={siteContent?.hero_heading}
+        subtext={siteContent?.hero_subtext}
+        address={siteContent?.address}
+        imageUrl={siteContent?.hero_image_url}
+      />
       <QuickLinks />
       <NoticesAndMessage notices={notices} principalMessage={principalMessage} />
       <EventsPreview events={events} />
