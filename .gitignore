@@ -1,0 +1,56 @@
+# Per-subtree ignores live in frontend/.gitignore and backend/.gitignore.
+# Patterns here apply repo-wide.
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# SQLite databases — never commit DB files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# User-uploaded content (runtime artifacts)
+/uploads/
+
+# Logs
+*.log
+
+# Node (defensive — primary list is in frontend/.gitignore)
+node_modules/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Claude Code local-only settings (commit settings.json, not settings.local.json)
+.claude/settings.local.json
