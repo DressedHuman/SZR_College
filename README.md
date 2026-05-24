@@ -128,11 +128,17 @@ npm run lint
 ## Environment variables
 
 ### Backend (`backend/.env`)
+See `backend/.env.example` for the full template.
+
 | Variable | Description | Default |
 |---|---|---|
-| `SECRET_KEY` | JWT signing key — **must be set in production** | (required) |
-| `SQLALCHEMY_DATABASE_URI` | Async DB URL | `sqlite+aiosqlite:///./szr_college.db` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime | `60` |
+| `SECRET_KEY` | JWT signing key — **must be set in production** | insecure dev default |
+| `ALGORITHM` | JWT algorithm | `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Access token lifetime | `30` |
+| `REFRESH_TOKEN_EXPIRE_MINUTES` | Refresh token lifetime | `10080` (7 days) |
+| `PROJECT_NAME` / `VERSION` / `API_V1_STR` | App metadata served on the root + docs routes | see config |
+
+The SQLite URI is currently hardcoded in `app/core/config.py`. To target a different database, edit that file or convert `SQLALCHEMY_DATABASE_URI` into a settings field.
 
 ### Frontend (`frontend/.env.local`)
 | Variable | Description | Default |
