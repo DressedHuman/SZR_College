@@ -28,7 +28,8 @@ alembic upgrade head          # Apply all migrations
 alembic revision --autogenerate -m "description"   # Generate new migration
 
 # Tests
-python tests_runner.py
+pytest tests/test_api_security.py          # Pytest suite
+python tests_runner.py                     # Seeds users + smoke-tests endpoints — requires uvicorn running on :8000
 ```
 
 ### Environment
@@ -37,28 +38,33 @@ Backend reads from `backend/.env` — key variables: `SECRET_KEY`, `SQLALCHEMY_D
 
 ## Architecture
 
-### Frontend (`/frontend/src/app`)
+### Frontend (`/frontend`)
 
-Uses **Next.js App Router**. Route groups:
-- `/(site)/` — Public-facing pages (home, about, admission, notices, events, teachers, gallery)
-- `/dashboard/` — Student-only portal (results, routine, profile, notices)
-- `/admin/` — Admin-only panel (manage students, teachers, notices, results, site content)
-- `/debug/` — Debug utilities
+Next.js **16.2.4** + React **19** App Router. No `src/` directory — app code lives at `frontend/app/`, shared modules at `frontend/lib/` and `frontend/components/`.
 
-**Auth pattern**: `getSession()` in `app/lib/auth.ts` reads the `szr_token` cookie (JWT) server-side. Protected layouts call `getSession()` and redirect unauthenticated users. Role checks enforce `/dashboard` → student only, `/admin` → admin only, with cross-role redirects.
+Route groups under `frontend/app/`:
+- `(site)/` — Public-facing pages (home, about, admission, notices, events, teachers, gallery)
+- `dashboard/` — Student-only portal (results, routine, profile, notices)
+- `admin/` — Admin-only panel (manage students, teachers, notices, results, site content)
+- `debug/` — Debug utilities
 
-**API layer**: All backend calls go through typed fetch helpers in `app/lib/api.ts`. They attach `Authorization: Bearer <token>` from the cookie.
+**Auth — two layers:**
+1. `frontend/proxy.ts` is the Next.js middleware (Next 16 renamed `middleware.ts` → `proxy.ts`). It decodes the `szr_token` JWT *without verifying the signature* to enforce coarse routing: blocks unauthenticated access to `/dashboard` and `/admin`, redirects non-admins away from `/admin`, and bounces already-logged-in users off `/login`. Signature verification is the backend's job on every API call.
+2. `frontend/lib/session.ts` / `frontend/lib/auth.ts` — server-side `getSession()` reads the cookie inside protected layouts for finer-grained checks and to surface user info to pages.
 
-**Important note on Next.js version**: See `frontend/CLAUDE.md` — this version has breaking changes from training data. Read `node_modules/next/dist/docs/` for the actual API before writing new Next.js code.
+**API layer**: All backend calls go through typed fetch helpers in `frontend/lib/api.ts`. They attach `Authorization: Bearer <token>` from the cookie.
+
+**Important note on Next.js version**: See `frontend/AGENTS.md`. Next 16 + React 19 has breaking changes from training data (e.g. `middleware.ts` → `proxy.ts`, async route params, new caching defaults). Read the relevant guide in `frontend/node_modules/next/dist/docs/` before writing new Next.js code.
 
 ### Backend (`/backend/app`)
 
 Standard FastAPI layout:
 - `api/routes/` — One file per resource (`auth`, `students`, `teachers`, `notices`, `results`, `events`, `admissions`, `uploads`)
 - `core/` — `config.py` (Pydantic settings), `security.py` (JWT + bcrypt), `limiter.py` (slowapi rate limiting)
+- `db/` — Async engine/session factory wiring
 - `models/` — SQLAlchemy ORM models (async, SQLite via `aiosqlite`)
 - `schemas/` — Pydantic request/response schemas
-- `crud/` — Database operations
+- `services/` — Business logic / cross-resource operations called from route handlers
 
 Route dependencies: `SessionDep` injects the async DB session; `CurrentUser` validates the JWT and returns the user. Admin-only routes check `current_user.role == "admin"`.
 
@@ -76,4 +82,4 @@ SQLite in development (`szr_college.db` at repo root). Managed with Alembic. Key
 
 ### Key UI Stack
 
-TailwindCSS v4, Shadcn/ui components (`/frontend/src/components/ui/`), Lucide icons. Admin panel uses a dark sidebar layout; student dashboard uses a light sidebar layout.
+TailwindCSS v4, Shadcn/ui components (`frontend/components/ui/`), Lucide icons, `@base-ui/react` primitives. Admin panel uses a dark sidebar layout; student dashboard uses a light sidebar layout.
